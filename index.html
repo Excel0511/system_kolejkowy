@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Automat do wydawania numerków</title>
+    <style>
+        body {
+            background-color: #5887FF;
+            height: auto;
+        }
+
+        button {
+            width: 46%;
+            background-color: #1B264F;
+            color: rgb(255, 255, 255);
+            margin: 2%;
+            padding: 2%;
+            font-size: 5vh;
+            border-radius: 20px;
+            border-color: rgba(0, 0, 0, 0.24);
+            border: solid;
+        }
+
+        button:active {
+            transform: translateY(4px); /* Przycisk zapada się w dół */
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.90); /* Cień */
+            background-color: rgba(255, 255, 255, 0.2); /* Drobne przyciemnienie */
+        }
+        
+        #titlebar {
+            background-color: #715AFF;
+            border-radius: 10px;
+            border-color: white;
+            border: solid;
+            color: white;
+            padding: 1%;
+            display: flex;
+        }
+
+        h1 {
+            margin-left: auto;
+            margin-right: auto;
+            font-size: 10vh;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        h2 {
+            font-size: 50px;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        #confirmation_div {
+            display: none;
+            background-color: #715AFF;
+            border-color: white;
+            border: solid;
+            color: white;
+            height: 98.5vh;
+        }
+
+        #confirmation_text {
+            display: flex;
+            margin: auto;
+            background-color: #1B264F;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="titlebar">
+    <h1>Wybierz powód wizyty:</h1>
+    </div>
+
+    <div id="reasons">
+        <!--Tu będą guziki-->
+    </div>
+    
+    <!--Pokazanie numeru zgłoszenia pod koniec wyboru-->
+    <div id="confirmation_div">
+        <div id="confirmation_text">
+        <h2>Twój numer: <span id="ticketNumber"></span></h2>
+        </div>
+    </div>
+
+    <script>
+        // Pobieranie powodów wizyty
+        fetch("get_reasons.php")
+            .then(response => response.json())
+            .then(data => {
+                const reasonsDiv = document.getElementById("reasons");
+                data.forEach(reason => {
+                    const button = document.createElement("button");
+                    button.textContent = reason.name;
+                    button.onclick = () => {
+                        fetch("process.php", {
+                            method: "POST",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify({ reason_id: reason.id })
+                        })
+                        .then(response => response.json())
+                        .then(ticket => {
+                            document.getElementById("ticketNumber").textContent = ticket.ticket_id;
+                            reasonsDiv.style.display = "none";
+                            document.getElementById("confirmation_div").style.display = "flex";
+                            document.getElementById("titlebar").style.display = "none";
+                            setTimeout(() => {
+                                reasonsDiv.style.display = "block";
+                                document.getElementById("confirmation_div").style.display = "none";
+                                document.getElementById("titlebar").style.display = "flex";
+                            }, 5000);
+                        });
+                    };
+                    reasonsDiv.appendChild(button);
+                });
+            });
+    </script>
+</body>
+</html>

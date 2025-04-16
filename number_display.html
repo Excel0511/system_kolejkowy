@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wyświetlacz Numerków</title>
+    <style>
+        body {
+            background-color: black;
+            color: yellow;
+            font-size: 5em;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+    </style>
+</head>
+<body>
+    <div id="ticketNumber"></div>
+
+    <script>
+        function fetchCurrentTicket() {
+            fetch("display_current_ticket.php")
+                .then(response => response.json())
+                .then(data => {
+                    const ticketNumberDiv = document.getElementById("ticketNumber");
+                    ticketNumberDiv.textContent = data.current_ticket ? `${data.current_ticket}` : "";
+                });
+        }
+
+        setInterval(fetchCurrentTicket, 1000);
+    </script>
+</body>
+</html>
